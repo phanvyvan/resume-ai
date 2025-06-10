@@ -53,13 +53,16 @@ export const extractTextFromFile = async (file: File): Promise<{extractedText: s
 };
 
 // Function to analyze resume from text
-export const analyzeResume = async (resumeText: string): Promise<ResumeAnalysis> => {
+export const analyzeResume = async (resumeText: string, jobDescription?: string): Promise<ResumeAnalysis> => {
   const response = await fetch(`${API_BASE_URL}/resume/analyze-text`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ text: resumeText }),
+    body: JSON.stringify({ 
+      text: resumeText, 
+      jobDescription: jobDescription ?? null, 
+    }),
   });
 
   if (!response.ok) {

@@ -119,7 +119,7 @@ const Upload = () => {
       // If we have extracted text, analyze it with Gemini first
       if (savedText) {
         toast.info("Đang phân tích CV với AI...");
-        const analysis = await analyzeResume(savedText);
+        const analysis = await analyzeResume(savedText, jobDescriptionText);
         
         // Convert to sections format
         const analyzedSections = analysis.sections.map((section, index) => ({
