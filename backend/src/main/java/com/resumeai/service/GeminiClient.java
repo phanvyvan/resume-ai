@@ -64,12 +64,11 @@ public class GeminiClient {
                 %s
                 ---
 
-                Hãy phân tích hồ sơ dựa trên MÔ TẢ CÔNG VIỆC và trích xuất các phần: "Kinh nghiệm làm việc", "Học vấn", và "Kỹ năng". 
+                Hãy phân tích hồ sơ dựa trên MÔ TẢ CÔNG VIỆC và trích xuất các phần: "Kinh nghiệm làm việc", "Học vấn", và "Kỹ năng".
                 Với mỗi phần, hãy:
-                1. Trích xuất và tóm tắt nội dung hiện tại từ hồ sơ
-                2. Đánh giá mức độ phù hợp của phần này so với mô tả công việc (ghi rõ: phù hợp / chưa phù hợp)
-                3. Đề xuất chỉnh sửa/bổ sung để nâng cao mức độ phù hợp
-                4. Giải thích lý do tại sao cần những đề xuất đó
+                1. Trích xuất và tóm tắt nội dung hiện tại từ hồ sơ (noi_dung)
+                2. Đề xuất chỉnh sửa/bổ sung để nâng cao mức độ phù hợp với công việc (de_xuat)
+                3. Giải thích lý do tại sao cần những đề xuất đó (ly_do)
 
                 Nếu phần nào bị thiếu, hãy ghi rõ "Không có thông tin" trong nội dung.
 

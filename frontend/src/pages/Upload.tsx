@@ -119,19 +119,47 @@ const Upload = () => {
       // If we have extracted text, analyze it with Gemini first
       if (savedText) {
         toast.info("Đang phân tích CV với AI...");
-        const analysis = await analyzeResume(savedText, jobDescriptionText);
-        
-        // Convert to sections format
-        const analyzedSections = analysis.sections.map((section, index) => ({
-          id: `section-${index}`,
-          title: section.title,
-          content: section.content
-        }));
-        
-        // Save analyzed data
-        localStorage.setItem("resumeSectionsForEval", JSON.stringify(analyzedSections));
-        if (analysis.personalInfo) {
-          localStorage.setItem("personalInfo", JSON.stringify(analysis.personalInfo));
+        const analysis = await analyzeResume(savedText, jobDescriptionText || undefined);
+
+        // Check if analysis has data
+        if (analysis) {
+          // Convert backend format to sections format
+          const analyzedSections = [];
+
+          if (analysis.kinh_nghiem_lam_viec) {
+            analyzedSections.push({
+              id: 'kinh-nghiem',
+              title: 'Kinh nghiệm làm việc',
+              content: analysis.kinh_nghiem_lam_viec.noi_dung,
+              improvements: [analysis.kinh_nghiem_lam_viec.de_xuat],
+              reason: analysis.kinh_nghiem_lam_viec.ly_do
+            });
+          }
+
+          if (analysis.hoc_van) {
+            analyzedSections.push({
+              id: 'hoc-van',
+              title: 'Học vấn',
+              content: analysis.hoc_van.noi_dung,
+              improvements: [analysis.hoc_van.de_xuat],
+              reason: analysis.hoc_van.ly_do
+            });
+          }
+
+          if (analysis.ky_nang) {
+            analyzedSections.push({
+              id: 'ky-nang',
+              title: 'Kỹ năng',
+              content: analysis.ky_nang.noi_dung,
+              improvements: [analysis.ky_nang.de_xuat],
+              reason: analysis.ky_nang.ly_do
+            });
+          }
+
+          // Save analyzed data
+          localStorage.setItem("resumeSectionsForEval", JSON.stringify(analyzedSections));
+        } else {
+          throw new Error("Phản hồi từ AI không hợp lệ");
         }
       } else {
         // Use existing sections

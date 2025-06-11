@@ -3,18 +3,21 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 
 interface ResumeAnalysis {
-  personalInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
+  kinh_nghiem_lam_viec?: {
+    noi_dung: string;
+    de_xuat: string;
+    ly_do: string;
   };
-  sections: Array<{
-    title: string;
-    content: string;
-    improvements: string[];
-  }>;
-  extractedText?: string;
+  hoc_van?: {
+    noi_dung: string;
+    de_xuat: string;
+    ly_do: string;
+  };
+  ky_nang?: {
+    noi_dung: string;
+    de_xuat: string;
+    ly_do: string;
+  };
 }
 
 interface InterviewQuestion {
@@ -148,16 +151,39 @@ export const geminiApi = {
     // Convert old format to new format
     const resumeText = Object.values(resumeContent).join('\n');
     const analysis = await analyzeResume(resumeText);
-    
+
+    // Convert new backend format to old format for compatibility
+    const improvements = [];
+
+    if (analysis.kinh_nghiem_lam_viec) {
+      improvements.push({
+        section: 'Kinh nghiệm làm việc',
+        original: analysis.kinh_nghiem_lam_viec.noi_dung.split('\n')[0] || '',
+        suggestion: analysis.kinh_nghiem_lam_viec.de_xuat,
+        reason: analysis.kinh_nghiem_lam_viec.ly_do
+      });
+    }
+
+    if (analysis.hoc_van) {
+      improvements.push({
+        section: 'Học vấn',
+        original: analysis.hoc_van.noi_dung.split('\n')[0] || '',
+        suggestion: analysis.hoc_van.de_xuat,
+        reason: analysis.hoc_van.ly_do
+      });
+    }
+
+    if (analysis.ky_nang) {
+      improvements.push({
+        section: 'Kỹ năng',
+        original: analysis.ky_nang.noi_dung.split('\n')[0] || '',
+        suggestion: analysis.ky_nang.de_xuat,
+        reason: analysis.ky_nang.ly_do
+      });
+    }
+
     return {
-      improvements: analysis.sections.flatMap(section => 
-        section.improvements.map(improvement => ({
-          section: section.title,
-          original: section.content.split('\n')[0] || '',
-          suggestion: improvement,
-          reason: 'Gợi ý cải thiện từ AI'
-        }))
-      ),
+      improvements,
       improvedContent: resumeContent // Return original for now
     };
   },

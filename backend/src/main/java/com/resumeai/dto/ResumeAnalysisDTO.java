@@ -58,13 +58,13 @@ public class ResumeAnalysisDTO {
  * DTO cho từng phần phân tích (kinh nghiệm, học vấn, kỹ năng)
  */
 class SectionAnalysisDTO {
-    
+
     @JsonProperty("noi_dung")
     private String noiDung;
-    
+
     @JsonProperty("de_xuat")
     private String deXuat;
-    
+
     @JsonProperty("ly_do")
     private String lyDo;
 
@@ -76,6 +76,8 @@ class SectionAnalysisDTO {
         this.deXuat = deXuat;
         this.lyDo = lyDo;
     }
+
+
 
     // Getters and Setters
     public String getNoiDung() {
@@ -101,4 +103,6 @@ class SectionAnalysisDTO {
     public void setLyDo(String lyDo) {
         this.lyDo = lyDo;
     }
+
+
 }
