@@ -186,10 +186,11 @@ const MockInterview = () => {
     setIsLoading(true);
     setLoadingProgress(0);
     setLoadingMessage(`Đang chuẩn bị câu hỏi cho vị trí ${info.position}...`);
+    let progressInterval: NodeJS.Timeout | null = null;
 
     try {
       // Simulate progress updates
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setLoadingProgress(prev => {
           if (prev < 90) return prev + 8;
           return prev;
@@ -204,7 +205,13 @@ const MockInterview = () => {
         new Promise(resolve => setTimeout(resolve, 2000)) // Delay tối thiểu 2 giây
       ]);
 
-      clearInterval(progressInterval);
+      if (progressInterval) clearInterval(progressInterval);
+
+      // Kiểm tra xem có câu hỏi được tạo hay không
+      if (!fetchedQuestions || fetchedQuestions.length === 0) {
+        throw new Error("Không thể tạo câu hỏi phỏng vấn. Có thể do API key hết hạn hoặc đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau.");
+      }
+
       setLoadingProgress(100);
       setLoadingMessage("Hoàn thành!");
 
@@ -214,7 +221,25 @@ const MockInterview = () => {
       setQuestions(fetchedQuestions);
     } catch (error) {
       console.error("Error fetching questions:", error);
-      toast.error("Đã xảy ra lỗi khi tải câu hỏi phỏng vấn. Vui lòng thử lại.");
+      if (progressInterval) clearInterval(progressInterval);
+
+      // Hiển thị thông báo lỗi cụ thể
+      let errorMessage = "Đã xảy ra lỗi khi tải câu hỏi phỏng vấn. Vui lòng thử lại.";
+      if (error instanceof Error) {
+        if (error.message.includes("API key") || error.message.includes("giới hạn")) {
+          errorMessage = error.message;
+        } else if (error.message.includes("rate limit") || error.message.includes("429")) {
+          errorMessage = "Đã vượt quá giới hạn sử dụng API. Vui lòng thử lại sau vài phút.";
+        } else if (error.message.includes("401") || error.message.includes("unauthorized")) {
+          errorMessage = "API key không hợp lệ hoặc đã hết hạn. Vui lòng liên hệ quản trị viên.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      toast.error(errorMessage);
+
+      // Quay lại form setup để người dùng có thể thử lại
+      setShowInterviewSetup(true);
     } finally {
       setIsLoading(false);
       setLoadingProgress(0);
@@ -229,6 +254,12 @@ const MockInterview = () => {
   };
 
   const startInterview = () => {
+    // Kiểm tra xem có câu hỏi hay không trước khi bắt đầu
+    if (!questions || questions.length === 0) {
+      toast.error("Không có câu hỏi phỏng vấn. Vui lòng thử lại.");
+      setShowInterviewSetup(true);
+      return;
+    }
     setInterviewStarted(true);
   };
 
@@ -451,16 +482,17 @@ const MockInterview = () => {
                 </div>
               </div>
             ) : !interviewStarted ? (
-              <div className="max-w-3xl mx-auto text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">Sẵn sàng cho phỏng vấn?</h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Chúng tôi đã chuẩn bị {questions.length} câu hỏi phỏng vấn
-                  {hasResume
-                    ? " phù hợp với hồ sơ của bạn"
-                    : ` cho vị trí ${interviewInfo?.position} trong lĩnh vực ${interviewInfo?.field}`
-                  }.
-                  Mỗi câu trả lời sẽ được đánh giá và bạn sẽ nhận được phản hồi chi tiết.
-                </p>
+              questions.length > 0 ? (
+                <div className="max-w-3xl mx-auto text-center py-12">
+                  <h2 className="text-2xl font-bold mb-4">Sẵn sàng cho phỏng vấn?</h2>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    Chúng tôi đã chuẩn bị {questions.length} câu hỏi phỏng vấn
+                    {hasResume
+                      ? " phù hợp với hồ sơ của bạn"
+                      : ` cho vị trí ${interviewInfo?.position} trong lĩnh vực ${interviewInfo?.field}`
+                    }.
+                    Mỗi câu trả lời sẽ được đánh giá và bạn sẽ nhận được phản hồi chi tiết.
+                  </p>
                 
                 {!hasResume && (
                   <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -498,6 +530,22 @@ const MockInterview = () => {
                   </Button>
                 </div>
               </div>
+              ) : (
+                <div className="max-w-3xl mx-auto text-center py-12">
+                  <h2 className="text-2xl font-bold mb-4 text-red-600">Không thể tạo câu hỏi phỏng vấn</h2>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    Đã xảy ra lỗi khi tạo câu hỏi phỏng vấn. Có thể do API key hết hạn hoặc đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau.
+                  </p>
+                  <Button
+                    onClick={() => setShowInterviewSetup(true)}
+                    size="lg"
+                    className="gap-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Thử lại
+                  </Button>
+                </div>
+              )
             ) : !interviewFinished ? (
               <div className="py-8">
                 <InterviewQuestion

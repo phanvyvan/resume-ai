@@ -64,7 +64,7 @@ public class MockInterviewServiceImpl implements MockInterviewService {
             return questions != null ? questions : new ArrayList<>();
         } catch (Exception e) {
             logger.error("Error generating questions: {}", e.getMessage(), e);
-            return new ArrayList<>();
+            throw new RuntimeException("Không thể tạo câu hỏi phỏng vấn: " + e.getMessage(), e);
         }
     }
 

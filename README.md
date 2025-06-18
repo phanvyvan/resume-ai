@@ -37,22 +37,18 @@ profile-wise-upgrade-ai/
 - Upload file PDF, DOC, DOCX
 - Trích xuất text tự động
 - Phân tích và đưa ra gợi ý cải thiện
-- Hiển thị thông tin cá nhân được trích xuất
-
-### ✅ So sánh Job Description
+- Hiển thị thông tin được trích xuất
+- Chủ động chỉnh sửa thông tin trước khi gửi AI phân tích
 - Upload hoặc paste mô tả công việc
-- Tính điểm phù hợp với CV
-- Phân tích điểm mạnh và điểm cần cải thiện
 
 ### ✅ Mock Interview
 - Tạo câu hỏi phỏng vấn dựa trên CV và JD
 - Hỗ trợ chọn ngành nghề nếu chưa có CV
 - Timer cho từng câu hỏi
-- Mô phỏng ghi âm câu trả lời
+- Nhập câu trả lời bằng giọng nói
 
 ### ✅ Giao diện responsive
 - Thiết kế mobile-first
-- Dark/Light mode support
 - UI components hiện đại với Shadcn/UI
 
 ## Cài đặt và chạy
